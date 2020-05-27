@@ -11,5 +11,10 @@ Tecnologias utilizadas:
 - JQuery
 - Socket.IO
 - NodeJS
+- Bootstrap
+
+
+------------
+
 
 [![Página pincipal do CHAT](https://i.imgur.com/1dim1NE.png "Página pincipal do CHAT")](https://i.imgur.com/1dim1NE.png "Página pincipal do CHAT")
