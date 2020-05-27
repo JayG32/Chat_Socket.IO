@@ -1,0 +1,262 @@
+<html>
+    <head>
+        <meta charset="UTF-8" >
+        <title>ChatJS </title>
+        <link rel="stylesheet" type="text/css" href="/css/style.css" />
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap.css" />
+        <link rel="stylesheet" type="text/css" href="/css/all.css" />
+    </head>
+<body>
+    <!-- Div com o formulário de acesso, para inserir o apelido ------------------------------------------------------- -->
+    <div class="acesso_usuario">
+        <form class="login">
+            <input type="text" placeholder="Insira seu apelido" name="apelido" class="apelido" />
+            <input class="btn btn-sm btn-success btn_entrar" type="submit" value="Entrar"/>
+        </form>
+    </div>
+
+
+    <!-- Div com todo o conteudo de mensagens ------------------------------------------------------- -->
+    
+    <div class="container chat_container">
+        <div class="main" >
+            <!-- Div lista lateral de usuários -->
+            <div class="usuarios_container">
+
+                <header class="header_usuarios">
+                    
+                </header>
+
+                <div class="p-3 ">
+                    <button type="button" class="btn btn-block btn-sm btn-success btn_editar" >Editar Usuário</button>
+                    <form class="form_editar">
+                        <input type="text" class="mudar_apelido form-control form-control-sm" >
+                        <button class="btn btn-success btn-sm float-right mt-2" type="submit" >Editar</button>
+                    </form>
+                </div>
+    
+                <section class="section_usuarios">
+ 
+                </section>
+            </div>
+
+            <!-- Div mensagens de usuários -->
+            <div class="mensagens_container">
+                <header class="header_mensagens"> 
+                    <h3>Conversando com: Todos</h3>
+                </header>
+
+                <div class="conteudo_mensagens">
+                    
+                </div>
+
+                <footer class="footer_mensagens">
+                    <form class="chat">
+                        <div class="form-row">
+
+                            <div class="col-sm-11">
+                                <input type="text " class="footer_conteudo_mensagem form-control">
+                                <input type="hidden" class="user_send" id="">
+                            </div>
+
+                            <div class="col-sm-1">
+                                <i class="fas fa-paper-plane icon_envio" ></i>
+                            </div>
+                        </div>
+                    </form>                                        
+                </footer>
+            </div>
+    
+        </div>
+    
+    </div>
+          
+    <!-- Principais funcionalidades do chat -->
+
+     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+
+     <script type="text/javascript">
+
+        var socket = io.connect(); //variavel referente a bibliotca Socket.IO. 
+                                    //Responsável por todas as funcionalidades do socket
+
+
+        //Login de usuário
+        $("form.login").submit(function (e) {
+            e.preventDefault(); //Evita que o formulário prossiga ao evento action.
+
+            // Evento enviado quando o usuário insere um apelido
+            socket.emit("entrar", $("input.apelido").val(), function (valido) {
+                if (valido) {
+                    // Caso não exista nenhum usuário com o mesmo nome, o painel principal é exibido
+                    $(".acesso_usuario").hide();//esconder página de login
+                    $(".chat_container").show();//mostrar página principal
+
+                    //Nome do usuário logado exibido no cabeçalho na lista de usuários 
+                    $(".header_usuarios").html("<h3>" + $("input.apelido").val() + "</h3>") 
+                } else {
+                    // Do contrário o campo é limpo e é apresentado um alert
+                    $(".acesso_usuario").val("");
+                    alert("Nome já utilizado nesta sala");
+                }
+            });
+        });
+
+       
+        //atualizando lista de usuarios 
+        socket.on("atualizar usuarios", function (usuarios) {
+            $(".section_usuarios").empty(); //Limpa a lista de usuários 
+
+            var opcao_todos = `<div class="usuarios_inner" id="Todos">
+                                    <i class="fas fa-users"></i>
+                                    <span class="user_name" >Todos</span>
+                                </div>`;
+            $(".section_usuarios").append(opcao_todos);  
+
+            //monta a lista de usuários que estão conectados
+            $.each(usuarios, function (indice) {
+                var opcao_usuario = ` <div class="usuarios_inner" id="${usuarios[indice]}">
+                                        <i class="fas fa-user"></i>
+                                        <span class="user_name" > ${usuarios[indice]} </span>
+                                    </div>`
+                $(".section_usuarios").append(opcao_usuario);
+                
+            });
+        });
+
+        //Quando clicar em um usuário especifico o mesmo é selecionado
+        $(document).on('click', '.usuarios_inner', function () {
+            let usuario = $(this).attr('id');
+            $(".user_send").val(usuario);
+            $(".header_mensagens").html('<h3>Conversando com: ' + usuario.toUpperCase()+'</h3>');
+        });
+
+        //Evento de envio de mensagens
+        $("form.chat").submit(function (e) {
+            e.preventDefault();
+
+            var mensagem = $(".footer_conteudo_mensagem").val();
+            var usuario =  $(".user_send").val(); // Usuário selecionado na lista lateral esquerda 
+            
+            // Evento acionado no servidor para o envio da mensagem, junto com o nome do usuário selecionado da lista
+            socket.emit("enviar mensagem", {msg: mensagem, usu: usuario == 'Todos' ? '' : usuario}, function () {
+               $("form.chat .footer_conteudo_mensagem").val("");
+            });
+        });
+
+        // Resposta ao envio de mensagens do servidor
+        socket.on("atualizar mensagens", function (dados) {
+            $('.conteudo_mensagens').append();
+
+            //teste de verificação de quem está mandando a mensagem se é o sistema ou o usuário
+            if (dados.tipo == 'sistema') {
+                let received_system = ` <div class="received_container">
+                                            <i class="fas fa-user icon_mensagem"></i>
+                                            <div class="received_inner bg-warning">
+                                                <div class="received_name">
+                                                    ${dados.msg}
+                                                </div>
+                                            </div>
+                                        </div>`
+                $('.conteudo_mensagens').append(received_system);
+            }else if(dados.tipo == ''){
+                // console.log(dados)
+
+                //div_user recebe toda a div que mostra o nome do usuário logado
+                let user = $('.header_usuarios h3').html();
+                
+                //verifica se a mensagem que está vindo do socket é a mesma mensagem do usuário logado
+                if (dados.usuario === user) {
+                //Onde tiver | ele vai transformar em um array
+                let message = dados.msg.split('|');
+
+                let send = ` <div class="send_container">
+                                    <div class="send_inner">
+                                        <div class="send_name">
+                                            ${message[0]}
+                                        </div>
+                                            ${message[1]}
+                                    </div>
+                                    <i class="fas fa-user icon_mensagem" ></i>
+                                </div>`
+                $('.conteudo_mensagens').append(send);
+                }else{
+                    let message = dados.msg.split('|');
+
+                    let received = `    <div class="received_container">
+                                            <i class="fas fa-user icon_mensagem"></i>
+                                            <div class="received_inner">
+                                                <div class="received_name">
+                                                    ${message[0]}
+                                                </div>
+                                                    ${message[1]}
+                                            </div>
+                                        </div>`
+                $('.conteudo_mensagens').append(received);
+                }
+   
+            }else if(dados.tipo == 'privada'){
+                 //div_user recebe toda a div que mostra o nome do usuário logado
+                 let user = $('.header_usuarios h3').html().trim();
+                
+                //verifica se a mensagem que está vindo socket é a mesma mensagem do usuário logado
+                if (dados.usuario.trim() === user) {
+                //Onde tiver | ele vai transformar em um array
+                let message = dados.msg.split('|');
+
+                let send = ` <div class="send_container">
+                                    <div class="send_inner">
+                                        <div class="send_name">
+                                            ${message[0]}
+                                        </div>
+                                            ${message[1]}
+                                    </div>
+                                    <i class="fas fa-user icon_mensagem" ></i>
+                                </div>`
+                $('.conteudo_mensagens').append(send);
+                }else{
+                    let message = dados.msg.split('|');
+
+                    let received = ` < <div class="received_container">
+                                            <i class="fas fa-user icon_mensagem"></i>
+                                            <div class="received_inner bg-dark">
+                                                <div class="received_name">
+                                                    ${message[0]}
+                                                </div>
+                                                    ${message[1]}
+                                            </div>
+                                        </div>`
+                $('.conteudo_mensagens').append(received);
+                }
+            }
+        });
+
+        $('.btn_editar').click(function () {
+          
+            $(".btn_editar").hide();
+            $(".form_editar").show();
+
+        })
+
+        //Evento para edição do usuário
+        $('.form_editar').submit(function (e) {
+            e.preventDefault();
+            
+            let editar_apelido = {
+                nome: $(".header_usuarios h3").html(),
+                novo_nome: $(this).find('input.mudar_apelido').val()
+            }
+            
+            socket.emit("enviar apelido", editar_apelido, function (valido) {
+               alert ("Usuário atualizado com Sucesso!"); //Mensagme de sucesso após alterar o nome de usuário
+               $(".header_usuarios h3").html($(".mudar_apelido").val()); //Seleciona o nome de usuário atraves do seletor    header_usuarios e altera para o novo nome
+               $(".mudar_apelido").val(''); //após o usuário inserir o novo nome e clicar em editar limpa o input
+               $(".form_editar").hide();//esconde o formulário de edição 
+               $(".btn_editar").show();//e mostra o botão editar usuário
+            });
+        });
+
+     </script>
+</body>
+</html> 

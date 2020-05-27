@@ -1,0 +1,187 @@
+body{
+	background-image: url('../img/background.jpg');
+}
+
+.main{
+	background-image: url('../img/background.jpg');
+}
+
+.chat_container{
+	display: none;
+}
+/* Acesso de usuário ********************************** */
+
+.acesso_usuario{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+}
+
+.btn_entrar, .apelido{
+	border-radius: 20px !important;
+}
+
+/* chat ********************************** */
+.main{
+	display: flex;
+	height: 100vh;
+}
+
+
+.usuarios_container{
+	width: 300px;
+	border-radius: 30px;
+	margin-right: 30px;
+	background-image: url('../img/whatsapp.jpg');
+}
+
+.mensagens_container{
+	flex: 1;
+	border-radius: 30px;
+}
+
+/* cabeçalho lista de usuários **********************************  */
+
+.header_usuarios{
+	height: 50px;
+	background-color: #EDEDED;
+	border-top-left-radius: 30px;
+	border-top-right-radius: 30px;
+}
+
+.header_usuarios h3{
+	text-align: center;
+	font-size: 20px;
+	line-height: 50px;
+}
+
+/* Conteudo lista de usuarios **********************************  */
+
+.usuarios_inner{
+	border-bottom: 1px solid #EDEDED;
+	padding: 10px 15px;
+	cursor: pointer;
+}
+
+.user_name{
+	padding-left: 5px;
+	font-weight: bold;
+}
+
+/* cabeçalho mensagens **********************************  */
+
+.header_mensagens{
+	height: 50px;
+	background-color: #EDEDED;
+	border-top-left-radius: 30px;
+	border-top-right-radius: 30px;
+	
+}
+
+.header_mensagens h3{
+	text-align: center;
+	font-size: 20px;
+	line-height: 50px;
+}
+
+/* Conteudo mensagens **********************************  */
+
+.conteudo_mensagens{
+	display: flex;
+	flex-direction: column;
+	background-image: url('../img/whatsapp.jpg');
+	height: 456px;
+	overflow: auto;
+}
+
+/* Estilo barra de rolagem lateral */
+.conteudo_mensagens::-webkit-scrollbar  {
+	background-color: rgba(0,0,0,0.3);
+	width: 5px;
+}
+
+.conteudo_mensagens::-webkit-scrollbar-thumb {
+	background-color: #ededed;
+	border-radius: 50px;
+}
+
+
+.received_container{
+	display: flex;
+	justify-content: flex-start;
+	margin-bottom: 25px;
+	padding-left: 15px;
+
+}
+
+.send_container{
+	display: flex;
+	justify-content: flex-end;
+	margin-bottom: 25px;
+	padding-right: 15px;
+}
+
+.received_inner{
+	border-radius: 30px;
+	padding: 10px 15px;
+	background-color: #82CCDD;
+	color: #fff;
+	margin-left: 15px;
+	max-width: 500px;	
+}
+
+.send_inner{
+	border-radius: 30px;
+	padding: 10px 15px;
+	background-color: #78E08F;
+	color: #fff;
+	margin-right: 15px;
+	max-width: 500px;
+}
+
+.received_name, .send_name{
+	font-weight: bold;
+}
+
+.icon_mensagem{
+	font-size: 25px;
+}
+
+/* Conteudo do Rodape do chat **********************************  */
+
+.footer_mensagens{
+	height: 68px;
+	width: 100%;
+	background-image: url('../img/whatsapp.jpg');
+	border-bottom-left-radius: 30px;
+	border-bottom-right-radius: 30px;
+	padding-right: 10px;
+}
+
+
+.footer_conteudo_mensagem{
+	height: 40px;
+	width: 700px;
+	background-color: #EDEDED;
+	border-radius: 60px !important;
+	margin: 15px 0 0 10px;
+	max-width: 700px;
+}
+
+.footer_conteudo_mensagem h3{
+	font-size: 20px;
+	padding: 8px 15px;
+}
+
+.icon_envio{
+	font-size: 35px;
+	margin: 15px 0 0 10px;
+}
+
+.form_editar{
+	display: none;
+}
+
+
+
